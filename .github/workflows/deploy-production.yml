@@ -1,0 +1,33 @@
+name: Deploy Production
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------------------------------------------------
+      # TEMPLATE: Vervang deze stap met je deploy tool.
+      # ---------------------------------------------------
+      - name: Deploy
+        run: |
+          echo "::notice::Configureer deployment in deze stap"
+          echo "Benodigde secrets: zie docs/ci-cd.md"
+        env:
+          # Voorbeeld voor DigitalOcean App Platform:
+          # DO_APP_NAME: ${{ secrets.DO_APP_NAME }}
+          # DO_ACCESS_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
+          DEPLOY_ENV: production

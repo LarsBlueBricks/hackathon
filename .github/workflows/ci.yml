@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, staging, main]
+  push:
+    branches: [develop, staging, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-check:
+    name: Supply Chain Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for compromised packages
+        run: |
+          COMPROMISED="chalk@5\.6\.1|debug@4\.4\.2|ansi-styles@6\.2\.2|supports-color@10\.2\.1|strip-ansi@7\.1\.1|color@5\.0\.1|color-convert@3\.1\.1|color-name@2\.0\.1|color-string@2\.1\.1|duckdb@1\.3\.3"
+          FOUND=false
+          for lockfile in backend/package-lock.json frontend/package-lock.json; do
+            if [ -f "$lockfile" ] && grep -qE "$COMPROMISED" "$lockfile"; then
+              echo "::error::Compromised packages found in $lockfile"
+              grep -E "$COMPROMISED" "$lockfile"
+              FOUND=true
+            fi
+          done
+          if [ "$FOUND" = true ]; then exit 1; fi
+          echo "No compromised packages found"
+
+  check-directories:
+    name: Detect Project Directories
+    runs-on: ubuntu-latest
+    needs: security-check
+    outputs:
+      has-backend: ${{ steps.check.outputs.has-backend }}
+      has-frontend: ${{ steps.check.outputs.has-frontend }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for backend and frontend
+        id: check
+        run: |
+          echo "has-backend=${{ hashFiles('backend/package.json') != '' }}" >> $GITHUB_OUTPUT
+          echo "has-frontend=${{ hashFiles('frontend/package.json') != '' }}" >> $GITHUB_OUTPUT
+
+  backend:
+    name: Backend Checks
+    runs-on: ubuntu-latest
+    needs: check-directories
+    if: needs.check-directories.outputs.has-backend == 'true'
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: npm audit
+        run: |
+          if ! npm audit --audit-level=high; then
+            echo "::warning::npm audit found high-severity vulnerabilities in backend. Run 'cd backend && npm audit' locally for details."
+          fi
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test:run
+
+  frontend:
+    name: Frontend Checks
+    runs-on: ubuntu-latest
+    needs: check-directories
+    if: needs.check-directories.outputs.has-frontend == 'true'
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: npm audit
+        run: |
+          if ! npm audit --audit-level=high; then
+            echo "::warning::npm audit found high-severity vulnerabilities in frontend. Run 'cd frontend && npm audit' locally for details."
+          fi
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test:run

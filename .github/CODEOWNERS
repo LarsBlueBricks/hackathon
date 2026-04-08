@@ -1,0 +1,12 @@
+# Default: alle PRs vereisen review van het team
+* @bluebricks-nl/developers
+
+# CI/CD wijzigingen vereisen lead review
+.github/ @bluebricks-nl/leads
+
+# Claude Code configuratie
+.claude/ @bluebricks-nl/leads
+CLAUDE.md @bluebricks-nl/leads
+
+# Database schema wijzigingen
+backend/prisma/ @bluebricks-nl/leads

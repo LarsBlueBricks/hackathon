@@ -1,0 +1,35 @@
+name: Deploy Staging
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [staging]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------------------------------------------------
+      # TEMPLATE: Vervang deze stap met je deploy tool.
+      # Opties: DigitalOcean App Platform, Railway, Fly.io,
+      #          Vercel, custom Docker, etc.
+      # ---------------------------------------------------
+      - name: Deploy
+        run: |
+          echo "::notice::Configureer deployment in deze stap"
+          echo "Benodigde secrets: zie docs/ci-cd.md"
+        env:
+          # Voorbeeld voor DigitalOcean App Platform:
+          # DO_APP_NAME: ${{ secrets.DO_APP_NAME }}
+          # DO_ACCESS_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
+          DEPLOY_ENV: staging
