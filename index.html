@@ -1446,6 +1446,44 @@
     }
 
     /* ==========================================================
+       LIVE DATA FETCH
+       ========================================================== */
+    async function fetchLiveEvents() {
+      var loadingBar = document.getElementById('loadingBar');
+      try {
+        loadingBar.classList.add('active');
+
+        var response = await fetch('/api/events');
+        var result = await response.json();
+
+        loadingBar.classList.remove('active');
+        loadingBar.classList.add('done');
+        setTimeout(function() {
+          loadingBar.classList.remove('done');
+          loadingBar.style.width = '';
+        }, 500);
+
+        if (result.data && result.data.length > 0) {
+          // Merge: keep seed events, add API events (avoid duplicates by id)
+          var existingIds = {};
+          events.forEach(function(e) { existingIds[e.id] = true; });
+          var newEvents = result.data.filter(function(e) { return !existingIds[e.id]; });
+
+          if (newEvents.length > 0) {
+            events = events.concat(newEvents);
+            localStorage.setItem('amsterdam-events', JSON.stringify(events));
+            renderCalendar();
+            renderEventsList();
+          }
+        }
+      } catch (err) {
+        // Silently fall back to seed/cached data
+        loadingBar.classList.remove('active');
+        loadingBar.style.width = '';
+      }
+    }
+
+    /* ==========================================================
        INIT
        ========================================================== */
     function init() {
@@ -1454,6 +1492,9 @@
       renderCalendar();
       renderEventsList();
       setupListeners();
+
+      // Try to fetch live data (non-blocking)
+      fetchLiveEvents();
     }
 
     document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "WebSearch",
+      "WebFetch(domain:www.iamsterdam.com)",
+      "WebFetch(domain:api.data.amsterdam.nl)",
+      "WebFetch(domain:developer.ticketmaster.com)",
+      "WebFetch(domain:public.opendatasoft.com)",
+      "WebFetch(domain:app.ticketmaster.com)",
+      "WebFetch(domain:developers.openagenda.com)",
+      "WebFetch(domain:allevents.in)",
+      "WebFetch(domain:www.songkick.com)",
+      "WebFetch(domain:activiteiten.amsterdam.nl)",
+      "WebFetch(domain:serpapi.com)"
+    ]
+  }
+}
