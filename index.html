@@ -5,12 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Amsterdam Events — Ontdek wat er te doen is</title>
   <meta name="description" content="Ontdek de leukste events in Amsterdam deze maand. Concerten, theater, food, kunst en meer.">
+  <meta name="theme-color" content="#FF6B35">
+  <meta property="og:title" content="Amsterdam Events">
+  <meta property="og:description" content="Ontdek wat er te doen is in Amsterdam. Concerten, theater, food, kunst en meer.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ========== RESET & BASE ========== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     :root {
       --orange: #FF6B35;
@@ -656,6 +662,43 @@
     }
 
     /* ========== RESPONSIVE ========== */
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .event-card {
+      animation: fadeInUp 0.3s ease-out both;
+    }
+
+    .event-card:nth-child(1) { animation-delay: 0s; }
+    .event-card:nth-child(2) { animation-delay: 0.04s; }
+    .event-card:nth-child(3) { animation-delay: 0.08s; }
+    .event-card:nth-child(4) { animation-delay: 0.12s; }
+    .event-card:nth-child(5) { animation-delay: 0.16s; }
+    .event-card:nth-child(6) { animation-delay: 0.2s; }
+    .event-card:nth-child(7) { animation-delay: 0.24s; }
+    .event-card:nth-child(8) { animation-delay: 0.28s; }
+    .event-card:nth-child(9) { animation-delay: 0.32s; }
+    .event-card:nth-child(10) { animation-delay: 0.36s; }
+
+    /* ========== FOCUS / ACCESSIBILITY ========== */
+    .nav-btn:focus-visible,
+    .today-btn:focus-visible,
+    .filter-chip:focus-visible,
+    .price-chip:focus-visible,
+    .search-box input:focus-visible,
+    .modal-close:focus-visible,
+    .event-card:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 2px;
+    }
+
+    .event-card { outline: none; }
+    .event-card:focus-visible { border-radius: var(--radius); }
+
+    /* ========== RESPONSIVE ========== */
     @media (min-width: 640px) {
       .header { padding: 36px 24px 32px; }
       .header h1 { font-size: 2.2rem; }
@@ -682,12 +725,22 @@
       }
     }
 
+    @media (min-width: 900px) {
+      .container { max-width: 960px; padding: 0 32px; }
+      .header h1 { font-size: 2.6rem; }
+      .header p { font-size: 1.05rem; }
+      .calendar-day { min-height: 90px; }
+      .day-number { font-size: 0.95rem; width: 30px; height: 30px; }
+      .event-dot { width: 8px; height: 8px; }
+    }
+
     @media (max-width: 480px) {
       .calendar-nav h2 { font-size: 1rem; min-width: 140px; }
       .calendar-day { min-height: 48px; padding: 4px 2px; }
       .day-number { font-size: 0.75rem; width: 24px; height: 24px; }
       .event-dot { width: 5px; height: 5px; }
       .event-card { padding: 12px; }
+      .events-section { padding-bottom: 24px; }
     }
 
     /* ========== FOOTER ========== */
@@ -779,7 +832,8 @@
   </div>
 
   <footer class="footer">
-    Amsterdam Events &mdash; Gebouwd met liefde voor de stad
+    <div>Amsterdam Events &mdash; Gebouwd met liefde voor de stad</div>
+    <div id="dataStatus" style="margin-top:4px;font-size:0.72rem;opacity:0.6"></div>
   </footer>
 
   <script>
@@ -1273,6 +1327,9 @@
           }
           renderCalendar();
           renderEventsList();
+          if (selectedDate) {
+            document.getElementById('eventsList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         });
       });
     }
@@ -1312,7 +1369,7 @@
       container.innerHTML = displayEvents.map(function(ev) {
         var catLabel = CATEGORIES.find(function(c) { return c.id === ev.category; });
         var priceLabel = ev.isFree ? 'Gratis' : ev.price;
-        return '<div class="event-card" data-cat="' + ev.category + '" data-id="' + ev.id + '">' +
+        return '<div class="event-card" data-cat="' + ev.category + '" data-id="' + ev.id + '" tabindex="0" role="button">' +
           '<div class="event-card-body">' +
             '<div class="event-card-top">' +
               '<span class="event-category-label">' +
@@ -1330,11 +1387,16 @@
         '</div>';
       }).join('');
 
-      // Click handlers for event cards
+      // Click + keyboard handlers for event cards
       container.querySelectorAll('.event-card').forEach(function(card) {
         card.addEventListener('click', function() {
-          var id = this.getAttribute('data-id');
-          showEventDetail(id);
+          showEventDetail(this.getAttribute('data-id'));
+        });
+        card.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showEventDetail(this.getAttribute('data-id'));
+          }
         });
       });
     }
@@ -1475,12 +1537,48 @@
             renderCalendar();
             renderEventsList();
           }
+          document.getElementById('dataStatus').textContent =
+            result.count + ' live events geladen via ' + result.source;
+        } else {
+          document.getElementById('dataStatus').textContent = 'Seed data — live events worden geladen zodra de API beschikbaar is';
         }
       } catch (err) {
         // Silently fall back to seed/cached data
         loadingBar.classList.remove('active');
         loadingBar.style.width = '';
+        document.getElementById('dataStatus').textContent = 'Offline modus — seed data';
       }
+    }
+
+    /* ==========================================================
+       TOUCH SWIPE — calendar month navigation
+       ========================================================== */
+    function setupSwipe() {
+      var grid = document.getElementById('calendarGrid');
+      var startX = 0;
+      var startY = 0;
+
+      grid.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      grid.addEventListener('touchend', function(e) {
+        var dx = e.changedTouches[0].clientX - startX;
+        var dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+
+        if (dx < 0) {
+          currentMonth++;
+          if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        } else {
+          currentMonth--;
+          if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        }
+        selectedDate = null;
+        renderCalendar();
+        renderEventsList();
+      }, { passive: true });
     }
 
     /* ==========================================================
@@ -1492,6 +1590,7 @@
       renderCalendar();
       renderEventsList();
       setupListeners();
+      setupSwipe();
 
       // Try to fetch live data (non-blocking)
       fetchLiveEvents();

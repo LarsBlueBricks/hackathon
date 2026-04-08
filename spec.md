@@ -88,6 +88,6 @@ Opslag: localStorage als cache. De serverless function haalt verse data op.
 
 - [ ] Week-weergave toggle
 - [ ] 2e scraping-bron
-- [ ] Animaties/transities
-- [ ] "Vandaag" highlight en quick-jump
+- [x] Animaties/transities
+- [x] "Vandaag" highlight en quick-jump
 - [ ] Event delen (copy link)
