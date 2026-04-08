@@ -3,10 +3,11 @@
  *
  * Fetches HTML from multiple Amsterdam event listing sites,
  * uses Claude AI (Haiku) to extract structured event data.
- * Falls back to Ticketmaster API if available.
+ * Stores results in Vercel Blob for persistent caching.
  *
  * Requires ANTHROPIC_API_KEY environment variable.
  * Optional: TICKETMASTER_API_KEY for additional events.
+ * Optional: BLOB_READ_WRITE_TOKEN for persistent storage.
  */
 
 var SOURCES = [
@@ -83,13 +84,35 @@ module.exports = async function handler(req, res) {
     // Deduplicate by title + date (fuzzy)
     allEvents = deduplicateEvents(allEvents);
 
+    // Save to Blob if we got fresh events
+    if (allEvents.length > 0) {
+      await writeToBlob({
+        events: allEvents,
+        scrapedAt: new Date().toISOString(),
+        sources: sources
+      });
+    }
+
     return res.status(200).json({
       data: allEvents,
       source: sources.join(' + ') || 'none',
-      count: allEvents.length
+      count: allEvents.length,
+      storage: 'saved'
     });
   } catch (err) {
     console.error('Scraper error:', err.message);
+
+    // Fallback: try reading from Blob
+    var cached = await readFromBlob();
+    if (cached && cached.events && cached.events.length > 0) {
+      return res.status(200).json({
+        data: cached.events,
+        source: 'cache (scraped ' + cached.scrapedAt + ')',
+        count: cached.events.length,
+        storage: 'from-blob'
+      });
+    }
+
     return res.status(200).json({ data: [], source: 'error', message: err.message });
   }
 };
@@ -379,4 +402,78 @@ function normalizeTitle(title) {
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '')
     .substring(0, 40);
+}
+
+/* ==========================================================
+   VERCEL BLOB STORAGE
+   ========================================================== */
+
+async function readFromBlob() {
+  var token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) return null;
+
+  try {
+    // List blobs to find our events file
+    var listRes = await fetch('https://blob.vercel-storage.com?prefix=amsterdam-events&limit=1', {
+      headers: { 'Authorization': 'Bearer ' + token },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!listRes.ok) return null;
+
+    var listData = await listRes.json();
+    if (!listData.blobs || listData.blobs.length === 0) return null;
+
+    // Fetch the blob content (public URL, no auth needed)
+    var blobRes = await fetch(listData.blobs[0].url, {
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!blobRes.ok) return null;
+
+    return await blobRes.json();
+  } catch (e) {
+    console.error('Blob read error:', e.message);
+    return null;
+  }
+}
+
+async function writeToBlob(data) {
+  var token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) return;
+
+  try {
+    // Delete old blobs first
+    var listRes = await fetch('https://blob.vercel-storage.com?prefix=amsterdam-events', {
+      headers: { 'Authorization': 'Bearer ' + token },
+      signal: AbortSignal.timeout(5000)
+    });
+
+    if (listRes.ok) {
+      var listData = await listRes.json();
+      if (listData.blobs && listData.blobs.length > 0) {
+        var urls = listData.blobs.map(function(b) { return b.url; });
+        await fetch('https://blob.vercel-storage.com/delete', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ urls: urls }),
+          signal: AbortSignal.timeout(5000)
+        });
+      }
+    }
+
+    // Write new blob
+    await fetch('https://blob.vercel-storage.com/amsterdam-events.json', {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+      signal: AbortSignal.timeout(5000)
+    });
+  } catch (e) {
+    console.error('Blob write error:', e.message);
+  }
 }
