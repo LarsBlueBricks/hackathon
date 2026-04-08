@@ -17,14 +17,14 @@ var SOURCES = [
     label: 'I Amsterdam'
   },
   {
-    name: 'uitinamsterdam',
-    url: 'https://www.uitinamsterdam.nl/en/events',
-    label: 'Uit in Amsterdam'
+    name: 'eventbrite',
+    url: 'https://www.eventbrite.nl/d/netherlands--amsterdam/events/',
+    label: 'Eventbrite Amsterdam'
   },
   {
-    name: 'timeout',
-    url: 'https://www.timeout.com/amsterdam/things-to-do/things-to-do-in-amsterdam-this-month',
-    label: 'Time Out Amsterdam'
+    name: 'partyflock',
+    url: 'https://partyflock.nl/city/1:Amsterdam',
+    label: 'Partyflock Amsterdam'
   }
 ];
 
