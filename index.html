@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amsterdam Events — Ontdek wat er te doen is</title>
+  <meta name="description" content="Ontdek de leukste events in Amsterdam deze maand. Concerten, theater, food, kunst en meer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --orange: #FF6B35;
+      --orange-light: #FF8A5C;
+      --red: #E8505B;
+      --red-light: #FF7B84;
+      --peach: #F7C59F;
+      --warm-white: #FFF8F0;
+      --warm-cream: #FFF1E6;
+      --dark: #1A1A2E;
+      --dark-soft: #2D3436;
+      --gray: #636E72;
+      --gray-light: #B2BEC3;
+      --light: #F8F9FA;
+
+      --cat-muziek: #FF6B35;
+      --cat-theater: #E8505B;
+      --cat-kunst: #A855F7;
+      --cat-food: #00B894;
+      --cat-sport: #0984E3;
+      --cat-tech: #06B6D4;
+      --cat-uitgaan: #EC4899;
+      --cat-overig: #9CA3AF;
+
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Poppins', -apple-system, sans-serif;
+      background: var(--warm-white);
+      color: var(--dark);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--red) 100%);
+      color: white;
+      padding: 28px 24px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 140%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      position: relative;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-top: 4px;
+      font-weight: 400;
+      position: relative;
+    }
+
+    /* ========== CONTAINER ========== */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* ========== SEARCH & FILTERS ========== */
+    .controls {
+      padding: 20px 0 8px;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      background: white;
+      font-family: inherit;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      outline: none;
+      color: var(--dark);
+    }
+
+    .search-box input:focus {
+      border-color: var(--orange);
+      box-shadow: var(--shadow-md), 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+
+    .search-box input::placeholder { color: var(--gray-light); }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-light);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .filter-row::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 50px;
+      border: 2px solid var(--light);
+      background: white;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--gray);
+      white-space: nowrap;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--gray-light);
+      background: var(--light);
+    }
+
+    .filter-chip.active {
+      color: white;
+      border-color: transparent;
+    }
+
+    .filter-chip[data-category="muziek"].active { background: var(--cat-muziek); }
+    .filter-chip[data-category="theater"].active { background: var(--cat-theater); }
+    .filter-chip[data-category="kunst"].active { background: var(--cat-kunst); }
+    .filter-chip[data-category="food"].active { background: var(--cat-food); }
+    .filter-chip[data-category="sport"].active { background: var(--cat-sport); }
+    .filter-chip[data-category="tech"].active { background: var(--cat-tech); }
+    .filter-chip[data-category="uitgaan"].active { background: var(--cat-uitgaan); }
+    .filter-chip[data-category="overig"].active { background: var(--cat-overig); }
+
+    .price-filters {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .price-chip {
+      padding: 6px 14px;
+      border-radius: 50px;
+      border: 2px solid var(--light);
+      background: white;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--gray);
+    }
+
+    .price-chip:hover { border-color: var(--gray-light); }
+
+    .price-chip.active {
+      background: var(--dark);
+      color: white;
+      border-color: var(--dark);
+    }
+
+    /* ========== CALENDAR ========== */
+    .calendar-section {
+      margin-top: 16px;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .calendar-nav h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .nav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: white;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--dark);
+      transition: var(--transition);
+    }
+
+    .nav-btn:hover {
+      background: var(--orange);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .today-btn {
+      padding: 7px 16px;
+      border-radius: 50px;
+      border: 2px solid var(--orange);
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--orange);
+      transition: var(--transition);
+    }
+
+    .today-btn:hover {
+      background: var(--orange);
+      color: white;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .weekday {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      padding: 8px 0;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      min-height: 60px;
+    }
+
+    .calendar-day:hover {
+      background: var(--warm-cream);
+      transform: scale(1.03);
+    }
+
+    .calendar-day.other-month {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .calendar-day.today .day-number {
+      background: var(--orange);
+      color: white;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calendar-day.selected {
+      background: var(--warm-cream);
+      box-shadow: inset 0 0 0 2px var(--orange);
+    }
+
+    .day-number {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--dark);
+      line-height: 1;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .event-dots {
+      display: flex;
+      gap: 3px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .event-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .more-count {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--gray);
+      line-height: 1;
+    }
+
+    /* ========== EVENTS LIST ========== */
+    .events-section {
+      margin-top: 24px;
+      padding-bottom: 40px;
+    }
+
+    .events-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .events-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .event-count {
+      font-size: 0.82rem;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .event-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: var(--transition);
+      border-left: 4px solid var(--gray-light);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .event-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .event-card[data-cat="muziek"] { border-left-color: var(--cat-muziek); }
+    .event-card[data-cat="theater"] { border-left-color: var(--cat-theater); }
+    .event-card[data-cat="kunst"] { border-left-color: var(--cat-kunst); }
+    .event-card[data-cat="food"] { border-left-color: var(--cat-food); }
+    .event-card[data-cat="sport"] { border-left-color: var(--cat-sport); }
+    .event-card[data-cat="tech"] { border-left-color: var(--cat-tech); }
+    .event-card[data-cat="uitgaan"] { border-left-color: var(--cat-uitgaan); }
+    .event-card[data-cat="overig"] { border-left-color: var(--cat-overig); }
+
+    .event-card-body { flex: 1; min-width: 0; }
+
+    .event-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .event-category-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .event-price-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 50px;
+      background: var(--warm-cream);
+      color: var(--orange);
+      white-space: nowrap;
+    }
+
+    .event-price-badge.free {
+      background: #E6F9F1;
+      color: #00B894;
+    }
+
+    .event-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: var(--gray);
+    }
+
+    .event-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .event-meta-icon {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--gray);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      font-size: 0.95rem;
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius) var(--radius) 0 0;
+      width: 100%;
+      max-width: 560px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--light);
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--red);
+      color: white;
+    }
+
+    .modal-category {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .modal h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .modal-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .modal-info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--dark-soft);
+    }
+
+    .modal-info-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-xs);
+      background: var(--warm-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .modal-description {
+      font-size: 0.92rem;
+      color: var(--dark-soft);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .modal-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--orange), var(--red));
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .modal-link:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ========== LOADING ========== */
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--orange), var(--red));
+      z-index: 2000;
+      transition: width 0.3s;
+    }
+
+    .loading-bar.active {
+      width: 70%;
+      transition: width 8s;
+    }
+
+    .loading-bar.done {
+      width: 100%;
+      transition: width 0.2s;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (min-width: 640px) {
+      .header { padding: 36px 24px 32px; }
+      .header h1 { font-size: 2.2rem; }
+      .container { padding: 0 24px; }
+
+      .calendar-day {
+        min-height: 80px;
+        padding: 8px 6px;
+      }
+
+      .modal {
+        border-radius: var(--radius);
+        margin: auto;
+        animation: fadeScale 0.25s ease-out;
+      }
+
+      .modal-overlay {
+        align-items: center;
+      }
+
+      @keyframes fadeScale {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+    }
+
+    @media (max-width: 480px) {
+      .calendar-nav h2 { font-size: 1rem; min-width: 140px; }
+      .calendar-day { min-height: 48px; padding: 4px 2px; }
+      .day-number { font-size: 0.75rem; width: 24px; height: 24px; }
+      .event-dot { width: 5px; height: 5px; }
+      .event-card { padding: 12px; }
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.78rem;
+      color: var(--gray-light);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-bar" id="loadingBar"></div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>Amsterdam Events</h1>
+    <p>Ontdek wat er te doen is in de stad</p>
+  </header>
+
+  <div class="container">
+
+    <!-- SEARCH & FILTERS -->
+    <section class="controls">
+      <div class="search-box">
+        <span class="search-icon">&#9906;</span>
+        <input type="text" id="searchInput" placeholder="Zoek op naam, locatie of beschrijving..." autocomplete="off">
+      </div>
+
+      <div class="filter-row" id="categoryFilters">
+        <!-- Generated by JS -->
+      </div>
+
+      <div class="price-filters" id="priceFilters">
+        <button class="price-chip active" data-price="all">Alle</button>
+        <button class="price-chip" data-price="free">Gratis</button>
+        <button class="price-chip" data-price="paid">Betaald</button>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="calendar-section">
+      <div class="calendar-header">
+        <div class="calendar-nav">
+          <button class="nav-btn" id="prevMonth" aria-label="Vorige maand">&#9664;</button>
+          <h2 id="monthYear"></h2>
+          <button class="nav-btn" id="nextMonth" aria-label="Volgende maand">&#9654;</button>
+        </div>
+        <button class="today-btn" id="todayBtn">Vandaag</button>
+      </div>
+
+      <div class="calendar-weekdays">
+        <div class="weekday">Ma</div>
+        <div class="weekday">Di</div>
+        <div class="weekday">Wo</div>
+        <div class="weekday">Do</div>
+        <div class="weekday">Vr</div>
+        <div class="weekday">Za</div>
+        <div class="weekday">Zo</div>
+      </div>
+
+      <div class="calendar-grid" id="calendarGrid">
+        <!-- Generated by JS -->
+      </div>
+    </section>
+
+    <!-- EVENTS LIST -->
+    <section class="events-section">
+      <div class="events-header">
+        <h3 id="eventsTitle">Komende events</h3>
+        <span class="event-count" id="eventCount"></span>
+      </div>
+      <div id="eventsList">
+        <!-- Generated by JS -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- EVENT DETAIL MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent">
+      <button class="modal-close" id="modalClose">&#10005;</button>
+      <div id="modalBody">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    Amsterdam Events &mdash; Gebouwd met liefde voor de stad
+  </footer>
+
+  <script>
+    /* ==========================================================
+       STATE
+       ========================================================== */
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+    let selectedDate = null;
+    let activeCategories = [];
+    let priceFilter = 'all';
+    let searchQuery = '';
+
+    const MONTHS = [
+      'Januari','Februari','Maart','April','Mei','Juni',
+      'Juli','Augustus','September','Oktober','November','December'
+    ];
+
+    const CATEGORIES = [
+      { id: 'muziek', label: 'Muziek' },
+      { id: 'theater', label: 'Theater' },
+      { id: 'kunst', label: 'Kunst' },
+      { id: 'food', label: 'Food' },
+      { id: 'sport', label: 'Sport' },
+      { id: 'tech', label: 'Tech' },
+      { id: 'uitgaan', label: 'Uitgaan' },
+      { id: 'overig', label: 'Overig' },
+    ];
+
+    const CAT_COLORS = {
+      muziek: '#FF6B35',
+      theater: '#E8505B',
+      kunst: '#A855F7',
+      food: '#00B894',
+      sport: '#0984E3',
+      tech: '#06B6D4',
+      uitgaan: '#EC4899',
+      overig: '#9CA3AF',
+    };
+
+    /* ==========================================================
+       SEED DATA — Realistic Amsterdam events for April 2026
+       ========================================================== */
+    const SEED_EVENTS = [
+      {
+        id: 'seed-1',
+        title: 'Running Amsterdam 10K',
+        description: 'Hardloop door het hart van Amsterdam langs de grachten, het Vondelpark en de Amstel. Start en finish bij het Olympisch Stadion. Inclusief medaille en afterparty.',
+        date: '2026-04-05',
+        time: '09:00',
+        location: 'Olympisch Stadion',
+        category: 'sport',
+        isFree: false,
+        price: '\u20AC25',
+        sourceUrl: 'https://runningamsterdam.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-2',
+        title: 'Amsterdam Tech Meetup: AI & Ethics',
+        description: 'Maandelijkse meetup voor de Amsterdamse tech-community. Deze editie: paneldiscussie over AI-ethiek met sprekers van UvA, Booking.com en Adyen. Gratis pizza en bier.',
+        date: '2026-04-08',
+        time: '18:30',
+        location: 'TQ Amsterdam, Singel 542',
+        category: 'tech',
+        isFree: true,
+        price: null,
+        sourceUrl: 'https://meetup.com/amsterdam-tech',
+        source: 'seed'
+      },
+      {
+        id: 'seed-3',
+        title: 'Boom Chicago: Best of Improv',
+        description: 'De legendarische improv-comedyshow van Boom Chicago. Al meer dan 30 jaar het grappigste theater van Amsterdam. Engelstalig.',
+        date: '2026-04-09',
+        time: '20:30',
+        location: 'Boom Chicago, Rozengracht 117',
+        category: 'theater',
+        isFree: false,
+        price: '\u20AC25',
+        sourceUrl: 'https://boomchicago.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-4',
+        title: 'Amsterdam Coffee Festival',
+        description: 'Drie dagen lang de beste koffiebranders, barista-wedstrijden, latte art workshops en proeverijen. De ultieme happening voor koffieliefhebbers.',
+        date: '2026-04-10',
+        time: '10:00',
+        location: 'Westergasfabriek',
+        category: 'food',
+        isFree: false,
+        price: '\u20AC15',
+        sourceUrl: 'https://amsterdamcoffeefestival.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-5',
+        title: 'Paradiso: Indie Rock Night',
+        description: 'Drie opkomende indie bands uit Amsterdam en Berlijn. Support act begint om 20:00, headliner om 22:00. Afterparty tot 03:00.',
+        date: '2026-04-11',
+        time: '20:00',
+        location: 'Paradiso, Weteringschans 6',
+        category: 'muziek',
+        isFree: false,
+        price: '\u20AC22',
+        sourceUrl: 'https://paradiso.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-6',
+        title: 'NDSM Kunstmarkt',
+        description: 'Open ateliers, live schilderen, sculpturen en installaties op de creatieve NDSM-werf. Meer dan 80 kunstenaars tonen hun werk. Gratis toegang.',
+        date: '2026-04-12',
+        time: '11:00',
+        location: 'NDSM Werf, Amsterdam-Noord',
+        category: 'kunst',
+        isFree: true,
+        price: null,
+        sourceUrl: 'https://ndsm.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-7',
+        title: 'Ajax - Feyenoord',
+        description: 'De Klassieker in de Eredivisie. Ajax ontvangt aartsrivaal Feyenoord in de Johan Cruijff ArenA. De spanning is te snijden.',
+        date: '2026-04-13',
+        time: '14:30',
+        location: 'Johan Cruijff ArenA',
+        category: 'sport',
+        isFree: false,
+        price: '\u20AC65',
+        sourceUrl: 'https://ajax.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-8',
+        title: 'Foodhallen: Japanese Street Food Week',
+        description: 'Een week lang Japanse streetfood specials bij alle Foodhallen-stands. Ramen battles, sake-proeverij en live taiko drums op vrijdagavond.',
+        date: '2026-04-14',
+        time: '17:00',
+        location: 'Foodhallen, Bellamyplein 51',
+        category: 'food',
+        isFree: true,
+        price: null,
+        sourceUrl: 'https://foodhallen.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-9',
+        title: 'ITA: Hamlet',
+        description: 'Internationaal Theater Amsterdam brengt een nieuwe, gewaagde interpretatie van Shakespeares meesterwerk. Regie: Ivo van Hove.',
+        date: '2026-04-14',
+        time: '19:30',
+        location: 'Internationaal Theater Amsterdam',
+        category: 'theater',
+        isFree: false,
+        price: '\u20AC35',
+        sourceUrl: 'https://ita.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-10',
+        title: 'Rijksmuseum: Nachttour Rembrandt',
+        description: 'Exclusieve avondrondleiding door de Rembrandt-zalen. Met een gids in klein gezelschap de Nachtwacht en andere meesterwerken bewonderen zonder de drukte.',
+        date: '2026-04-15',
+        time: '21:00',
+        location: 'Rijksmuseum, Museumstraat 1',
+        category: 'kunst',
+        isFree: false,
+        price: '\u20AC30',
+        sourceUrl: 'https://rijksmuseum.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-11',
+        title: 'Concertgebouw: Mahler\'s Vijfde',
+        description: 'Het Koninklijk Concertgebouworkest speelt Mahlers Vijfde Symfonie onder leiding van gastdirigent Gustavo Dudamel. Een onvergetelijke avond.',
+        date: '2026-04-16',
+        time: '20:15',
+        location: 'Het Concertgebouw',
+        category: 'muziek',
+        isFree: false,
+        price: '\u20AC45',
+        sourceUrl: 'https://concertgebouw.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-12',
+        title: 'Melkweg: Electronic Night',
+        description: 'Drie zalen, zes DJ\'s, \u00E9\u00E9n nacht. Van deep house tot techno. Line-up wordt een week van tevoren onthuld.',
+        date: '2026-04-17',
+        time: '23:00',
+        location: 'Melkweg, Lijnbaansgracht 234a',
+        category: 'uitgaan',
+        isFree: false,
+        price: '\u20AC18',
+        sourceUrl: 'https://melkweg.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-13',
+        title: 'Vondelpark Openluchttheater: Lenteconcert',
+        description: 'Gratis lenteconcert in het Vondelpark. Een mix van jazz, wereldmuziek en singer-songwriters. Neem een kleedje en een picknick mee.',
+        date: '2026-04-18',
+        time: '14:00',
+        location: 'Vondelpark Openluchttheater',
+        category: 'muziek',
+        isFree: true,
+        price: null,
+        sourceUrl: 'https://openluchttheater.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-14',
+        title: 'Albert Cuyp Street Food Tour',
+        description: 'Proef de wereld op de Albert Cuypmarkt. Van Surinaamse broodjes tot verse stroopwafels en Vietnamese pho. Zelfgeleide tour met kaart.',
+        date: '2026-04-19',
+        time: '12:00',
+        location: 'Albert Cuypmarkt, De Pijp',
+        category: 'food',
+        isFree: true,
+        price: null,
+        sourceUrl: 'https://albertcuypmarkt.amsterdam',
+        source: 'seed'
+      },
+      {
+        id: 'seed-15',
+        title: 'Stedelijk Museum: Opening \'Digital Futures\'',
+        description: 'Opening van de nieuwe tentoonstelling over digitale kunst en AI-gegenereerde werken. Interactieve installaties en VR-ervaringen.',
+        date: '2026-04-20',
+        time: '10:00',
+        location: 'Stedelijk Museum',
+        category: 'kunst',
+        isFree: false,
+        price: '\u20AC20',
+        sourceUrl: 'https://stedelijk.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-16',
+        title: 'De Kleine Komedie: Stand-up Night',
+        description: 'Vijf van Nederlands beste stand-up comedians. Engelstalige en Nederlandstalige sets. Het oudste theater van Amsterdam op zijn best.',
+        date: '2026-04-22',
+        time: '20:00',
+        location: 'De Kleine Komedie, Amstel 56',
+        category: 'theater',
+        isFree: false,
+        price: '\u20AC20',
+        sourceUrl: 'https://dekleinekomedie.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-17',
+        title: 'De Balie: Documentary Night',
+        description: 'Vertoning van drie korte documentaires over het veranderende Amsterdam, gevolgd door een paneldiscussie met de filmmakers.',
+        date: '2026-04-23',
+        time: '20:00',
+        location: 'De Balie, Kleine-Gartmanplantsoen 10',
+        category: 'theater',
+        isFree: false,
+        price: '\u20AC12',
+        sourceUrl: 'https://debalie.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-18',
+        title: 'Artis: Avondwandeling door de Zoo',
+        description: 'Ontdek Artis na sluitingstijd. Speciale avondroute met gids langs de nachtdieren, verlichte kassen en het planetarium.',
+        date: '2026-04-24',
+        time: '19:00',
+        location: 'Artis, Plantage Kerklaan 38',
+        category: 'overig',
+        isFree: false,
+        price: '\u20AC28',
+        sourceUrl: 'https://artis.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-19',
+        title: 'Amsterdam Startup Weekend',
+        description: '54 uur lang bouwen aan je startup-idee. Pitch vrijdagavond, bouw het hele weekend, presenteer zondag aan een jury van investeerders.',
+        date: '2026-04-25',
+        time: '18:00',
+        location: 'B.Amsterdam, Johan Huizingalaan 763a',
+        category: 'tech',
+        isFree: false,
+        price: '\u20AC49',
+        sourceUrl: 'https://startupweekend.org',
+        source: 'seed'
+      },
+      {
+        id: 'seed-20',
+        title: 'Thuishaven: Sunday Daydance',
+        description: 'Dansen in de zon aan het IJ. Open-air dansvloer, foodtrucks en cocktails. De perfecte zondagmiddag.',
+        date: '2026-04-26',
+        time: '14:00',
+        location: 'Thuishaven, Tt. Vasumweg 150',
+        category: 'uitgaan',
+        isFree: false,
+        price: '\u20AC30',
+        sourceUrl: 'https://thuishaven.nl',
+        source: 'seed'
+      },
+      {
+        id: 'seed-21',
+        title: 'Koningsdag Amsterdam',
+        description: 'De grootste feestdag van Nederland! Vrijmarkten door de hele stad, live muziek op elke gracht, bootjes op de Amstel en oranje zo ver je kunt kijken.',
+        date: '2026-04-27',
+        time: '09:00',
+        location: 'Heel Amsterdam',
+        category: 'overig',
+        isFree: true,
+        price: null,
+        sourceUrl: 'https://iamsterdam.com/koningsdag',
+        source: 'seed'
+      },
+      {
+        id: 'seed-22',
+        title: 'North Sea Jazz Club: Latin Jazz Night',
+        description: 'Een avond vol Cubaanse en Braziliaanse jazz. Live band, salsa-dansvloer en tropische cocktails.',
+        date: '2026-04-25',
+        time: '20:30',
+        location: 'North Sea Jazz Club, Pazzanistraat 1',
+        category: 'muziek',
+        isFree: false,
+        price: '\u20AC18',
+        sourceUrl: 'https://northseajazzclub.com',
+        source: 'seed'
+      },
+    ];
+
+    /* ==========================================================
+       DATA
+       ========================================================== */
+    let events = [];
+
+    function loadEvents() {
+      var cached = localStorage.getItem('amsterdam-events');
+      if (cached) {
+        try {
+          events = JSON.parse(cached);
+        } catch (e) {
+          events = SEED_EVENTS.slice();
+        }
+      } else {
+        events = SEED_EVENTS.slice();
+      }
+      if (!events.length) {
+        events = SEED_EVENTS.slice();
+      }
+      localStorage.setItem('amsterdam-events', JSON.stringify(events));
+    }
+
+    function getFilteredEvents() {
+      return events.filter(function(ev) {
+        if (searchQuery) {
+          var q = searchQuery.toLowerCase();
+          var match = ev.title.toLowerCase().includes(q) ||
+            ev.description.toLowerCase().includes(q) ||
+            ev.location.toLowerCase().includes(q);
+          if (!match) return false;
+        }
+
+        if (activeCategories.length > 0 && !activeCategories.includes(ev.category)) {
+          return false;
+        }
+
+        if (priceFilter === 'free' && !ev.isFree) return false;
+        if (priceFilter === 'paid' && ev.isFree) return false;
+
+        return true;
+      });
+    }
+
+    function getEventsForDate(dateStr) {
+      return getFilteredEvents().filter(function(ev) {
+        return ev.date === dateStr;
+      });
+    }
+
+    function dateStr(year, month, day) {
+      return year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    }
+
+    function formatDate(isoStr) {
+      var d = new Date(isoStr + 'T00:00:00');
+      var day = d.getDate();
+      var month = MONTHS[d.getMonth()].toLowerCase();
+      var year = d.getFullYear();
+      return day + ' ' + month + ' ' + year;
+    }
+
+    /* ==========================================================
+       RENDER: CATEGORY FILTERS
+       ========================================================== */
+    function renderCategoryFilters() {
+      var container = document.getElementById('categoryFilters');
+      container.innerHTML = CATEGORIES.map(function(cat) {
+        return '<button class="filter-chip" data-category="' + cat.id + '">' +
+          '<span class="cat-dot" style="background:' + CAT_COLORS[cat.id] + '"></span> ' +
+          cat.label + '</button>';
+      }).join('');
+
+      container.querySelectorAll('.filter-chip').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var cat = this.getAttribute('data-category');
+          var idx = activeCategories.indexOf(cat);
+          if (idx > -1) {
+            activeCategories.splice(idx, 1);
+            this.classList.remove('active');
+          } else {
+            activeCategories.push(cat);
+            this.classList.add('active');
+          }
+          renderCalendar();
+          renderEventsList();
+        });
+      });
+    }
+
+    /* ==========================================================
+       RENDER: CALENDAR
+       ========================================================== */
+    function renderCalendar() {
+      var grid = document.getElementById('calendarGrid');
+      var monthLabel = document.getElementById('monthYear');
+      monthLabel.textContent = MONTHS[currentMonth] + ' ' + currentYear;
+
+      var firstDay = new Date(currentYear, currentMonth, 1);
+      var lastDay = new Date(currentYear, currentMonth + 1, 0);
+      var startDow = firstDay.getDay();
+      var startOffset = startDow === 0 ? 6 : startDow - 1;
+      var daysInMonth = lastDay.getDate();
+      var prevMonthLast = new Date(currentYear, currentMonth, 0).getDate();
+
+      var todayStr = dateStr(today.getFullYear(), today.getMonth(), today.getDate());
+      var html = '';
+
+      // Previous month filler
+      for (var i = startOffset - 1; i >= 0; i--) {
+        html += '<div class="calendar-day other-month"><span class="day-number">' + (prevMonthLast - i) + '</span></div>';
+      }
+
+      // Current month
+      for (var d = 1; d <= daysInMonth; d++) {
+        var ds = dateStr(currentYear, currentMonth, d);
+        var dayEvents = getEventsForDate(ds);
+        var isToday = ds === todayStr;
+        var isSelected = ds === selectedDate;
+        var classes = 'calendar-day';
+        if (isToday) classes += ' today';
+        if (isSelected) classes += ' selected';
+        if (dayEvents.length > 0) classes += ' has-events';
+
+        html += '<div class="' + classes + '" data-date="' + ds + '">';
+        html += '<span class="day-number">' + d + '</span>';
+
+        if (dayEvents.length > 0) {
+          html += '<div class="event-dots">';
+          var shown = dayEvents.slice(0, 4);
+          shown.forEach(function(ev) {
+            html += '<span class="event-dot" style="background:' + CAT_COLORS[ev.category] + '"></span>';
+          });
+          if (dayEvents.length > 4) {
+            html += '<span class="more-count">+' + (dayEvents.length - 4) + '</span>';
+          }
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+
+      // Next month filler
+      var totalCells = startOffset + daysInMonth;
+      var remaining = (7 - (totalCells % 7)) % 7;
+      for (var n = 1; n <= remaining; n++) {
+        html += '<div class="calendar-day other-month"><span class="day-number">' + n + '</span></div>';
+      }
+
+      grid.innerHTML = html;
+
+      // Click handlers
+      grid.querySelectorAll('.calendar-day:not(.other-month)').forEach(function(cell) {
+        cell.addEventListener('click', function() {
+          var date = this.getAttribute('data-date');
+          if (selectedDate === date) {
+            selectedDate = null;
+          } else {
+            selectedDate = date;
+          }
+          renderCalendar();
+          renderEventsList();
+        });
+      });
+    }
+
+    /* ==========================================================
+       RENDER: EVENTS LIST
+       ========================================================== */
+    function renderEventsList() {
+      var container = document.getElementById('eventsList');
+      var titleEl = document.getElementById('eventsTitle');
+      var countEl = document.getElementById('eventCount');
+      var displayEvents;
+
+      if (selectedDate) {
+        displayEvents = getEventsForDate(selectedDate);
+        titleEl.textContent = 'Events op ' + formatDate(selectedDate);
+      } else {
+        // Show upcoming events from today
+        var todayStr = dateStr(today.getFullYear(), today.getMonth(), today.getDate());
+        displayEvents = getFilteredEvents()
+          .filter(function(ev) { return ev.date >= todayStr; })
+          .sort(function(a, b) { return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); })
+          .slice(0, 10);
+        titleEl.textContent = 'Komende events';
+      }
+
+      countEl.textContent = displayEvents.length + ' event' + (displayEvents.length !== 1 ? 's' : '');
+
+      if (displayEvents.length === 0) {
+        container.innerHTML = '<div class="empty-state">' +
+          '<div class="empty-state-icon">&#9788;</div>' +
+          '<p>Geen events gevonden' + (selectedDate ? ' op deze dag' : '') + '</p>' +
+          '</div>';
+        return;
+      }
+
+      container.innerHTML = displayEvents.map(function(ev) {
+        var catLabel = CATEGORIES.find(function(c) { return c.id === ev.category; });
+        var priceLabel = ev.isFree ? 'Gratis' : ev.price;
+        return '<div class="event-card" data-cat="' + ev.category + '" data-id="' + ev.id + '">' +
+          '<div class="event-card-body">' +
+            '<div class="event-card-top">' +
+              '<span class="event-category-label">' +
+                '<span class="cat-dot" style="background:' + CAT_COLORS[ev.category] + '"></span>' +
+                (catLabel ? catLabel.label : ev.category) +
+              '</span>' +
+              '<span class="event-price-badge ' + (ev.isFree ? 'free' : '') + '">' + priceLabel + '</span>' +
+            '</div>' +
+            '<h4>' + ev.title + '</h4>' +
+            '<div class="event-meta">' +
+              '<span><span class="event-meta-icon">&#128197;</span> ' + formatDate(ev.date) + ' &bull; ' + ev.time + '</span>' +
+              '<span><span class="event-meta-icon">&#128205;</span> ' + ev.location + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      // Click handlers for event cards
+      container.querySelectorAll('.event-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var id = this.getAttribute('data-id');
+          showEventDetail(id);
+        });
+      });
+    }
+
+    /* ==========================================================
+       RENDER: EVENT DETAIL MODAL
+       ========================================================== */
+    function showEventDetail(eventId) {
+      var ev = events.find(function(e) { return e.id === eventId; });
+      if (!ev) return;
+
+      var catLabel = CATEGORIES.find(function(c) { return c.id === ev.category; });
+      var priceLabel = ev.isFree ? 'Gratis' : ev.price;
+
+      document.getElementById('modalBody').innerHTML =
+        '<div class="modal-category">' +
+          '<span class="cat-dot" style="background:' + CAT_COLORS[ev.category] + ';width:10px;height:10px"></span>' +
+          (catLabel ? catLabel.label : ev.category) +
+        '</div>' +
+        '<h2>' + ev.title + '</h2>' +
+        '<div class="modal-info">' +
+          '<div class="modal-info-row">' +
+            '<div class="modal-info-icon">&#128197;</div>' +
+            '<div>' + formatDate(ev.date) + ' &bull; ' + ev.time + '</div>' +
+          '</div>' +
+          '<div class="modal-info-row">' +
+            '<div class="modal-info-icon">&#128205;</div>' +
+            '<div>' + ev.location + '</div>' +
+          '</div>' +
+          '<div class="modal-info-row">' +
+            '<div class="modal-info-icon">&#127915;</div>' +
+            '<div>' + priceLabel + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<p class="modal-description">' + ev.description + '</p>' +
+        '<a class="modal-link" href="' + ev.sourceUrl + '" target="_blank" rel="noopener noreferrer">' +
+          'Bekijk op ' + ev.source + ' &#8599;' +
+        '</a>';
+
+      document.getElementById('modalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    /* ==========================================================
+       EVENT LISTENERS
+       ========================================================== */
+    function setupListeners() {
+      // Month navigation
+      document.getElementById('prevMonth').addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        selectedDate = null;
+        renderCalendar();
+        renderEventsList();
+      });
+
+      document.getElementById('nextMonth').addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        selectedDate = null;
+        renderCalendar();
+        renderEventsList();
+      });
+
+      document.getElementById('todayBtn').addEventListener('click', function() {
+        currentYear = today.getFullYear();
+        currentMonth = today.getMonth();
+        selectedDate = dateStr(today.getFullYear(), today.getMonth(), today.getDate());
+        renderCalendar();
+        renderEventsList();
+      });
+
+      // Search
+      var searchTimer;
+      document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        var val = this.value;
+        searchTimer = setTimeout(function() {
+          searchQuery = val.trim();
+          renderCalendar();
+          renderEventsList();
+        }, 200);
+      });
+
+      // Price filters
+      document.querySelectorAll('.price-chip').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          priceFilter = this.getAttribute('data-price');
+          document.querySelectorAll('.price-chip').forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          renderCalendar();
+          renderEventsList();
+        });
+      });
+
+      // Modal close
+      document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+      });
+      document.getElementById('modalClose').addEventListener('click', closeModal);
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+      });
+    }
+
+    /* ==========================================================
+       INIT
+       ========================================================== */
+    function init() {
+      loadEvents();
+      renderCategoryFilters();
+      renderCalendar();
+      renderEventsList();
+      setupListeners();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
